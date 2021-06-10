@@ -109,6 +109,7 @@
     <Compile Include="Cryptor\HashSha256.cs" />
     <Compile Include="Cryptor\RsaCryptor.cs" />
     <Compile Include="Cryptor\XORCryptor.cs" />
+    <Compile Include="DB\CoreDbContext.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
