@@ -123,17 +123,6 @@ namespace CoreNet.Protocols
                     var ret = (Packet.PACKET_TYPE)_s.ReadUInt16();
                     return ret;
                 });
-
-            t = typeof(Packet.CONTENT_TYPE);
-            transDict[t] = new Tranlator((NetStream _s, object _obj)
-                => {
-                    _s.WriteUInt16((ushort)_obj);
-                },
-                (NetStream _s)
-                => {
-                    var ret = (Packet.CONTENT_TYPE)_s.ReadUInt16();
-                    return ret;
-                });
             logger.WriteDebugTrace("complete");
         }
 
