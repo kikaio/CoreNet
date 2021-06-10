@@ -119,6 +119,9 @@
     <Compile Include="Utils\LockHelper\LockedSwapQ.cs" />
     <Compile Include="Utils\LockHelper\Locker.cs" />
     <Compile Include="Utils\LockHelper\LockMgr.cs" />
+    <Compile Include="Utils\Loggers\ConsoleLogger.cs" />
+    <Compile Include="Utils\Loggers\CoreLogger.cs" />
+    <Compile Include="Utils\Loggers\Log4Logger.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
