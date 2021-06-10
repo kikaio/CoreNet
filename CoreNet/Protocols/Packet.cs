@@ -19,7 +19,6 @@ namespace CoreNet.Protocols
         public NetStream header { get; protected set; } = new NetStream(Packet.GetHeaderSize());
         public NetStream data { get; protected set; }
         public PACKET_TYPE pType { get; protected set; } = PACKET_TYPE.NONE;
-        public CONTENT_TYPE cType { get; protected set; } = CONTENT_TYPE.NONE;
 
         public enum PACKET_TYPE : ushort
         {
@@ -31,19 +30,7 @@ namespace CoreNet.Protocols
             END,
         }
 
-        public enum CONTENT_TYPE : ushort
-        {
-            NONE,
-            HB_CHECK,
-            WELCOME,
-            SIGN_IN,
-            SIGN_OUT,
-            LOG_IN,
-            LOG_OUT,
-            CHATTING,
-            TEST,
-            END,
-        };
+       
 
         public static Packet CopyPacket(Packet _orig)
         {
@@ -67,7 +54,6 @@ namespace CoreNet.Protocols
             data = _p.data;
             //content, packet type은 factory에서 읽는다.
             pType = _p.pType;
-            cType = _p.cType;
         }
 
         public Packet(NetStream _h, NetStream _d)
@@ -97,10 +83,6 @@ namespace CoreNet.Protocols
             return header.ReadInt32();
         }
 
-        public void ReadContent()
-        {
-            cType = Translate.Read<CONTENT_TYPE>(data);
-        }
         public void ReadPacketType()
         {
             pType = Translate.Read<PACKET_TYPE>(data);
