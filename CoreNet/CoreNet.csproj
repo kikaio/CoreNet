@@ -115,6 +115,7 @@
     <Compile Include="Jobs\JobOnce.cs" />
     <Compile Include="Jobs\Worker.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Sockets\CoreSock.cs" />
     <Compile Include="Utils\LockHelper\AsyncLocker.cs" />
     <Compile Include="Utils\LockHelper\LockedSwapQ.cs" />
     <Compile Include="Utils\LockHelper\Locker.cs" />
