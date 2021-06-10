@@ -110,6 +110,10 @@
     <Compile Include="Cryptor\RsaCryptor.cs" />
     <Compile Include="Cryptor\XORCryptor.cs" />
     <Compile Include="DB\CoreDbContext.cs" />
+    <Compile Include="Jobs\Job.cs" />
+    <Compile Include="Jobs\JobNormal.cs" />
+    <Compile Include="Jobs\JobOnce.cs" />
+    <Compile Include="Jobs\Worker.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Utils\LockHelper\AsyncLocker.cs" />
     <Compile Include="Utils\LockHelper\LockedSwapQ.cs" />
