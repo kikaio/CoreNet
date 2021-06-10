@@ -8,26 +8,30 @@ using System.Threading.Tasks;
 
 namespace CoreNet.Protocols
 {
+    using Writer = Action<NetStream, object>;
+    using Reader = Func<NetStream, object>;
+    using TransDict = Dictionary<Type, Translator>;
+    public class Translator
+    {
+
+        public Func<NetStream, object> Reader;
+        public Action<NetStream, object> Writer;
+        public Translator(Action<NetStream, object> _w, Func<NetStream, object> _r)
+        {
+            Reader = _r;
+            Writer = _w;
+        }
+    }
     public class Translate
     {
         public static ConsoleLogger logger = new ConsoleLogger();
-        public class Tranlator
-        {
+        
 
-            public Func<NetStream, object> Reader;
-            public Action<NetStream, object> Writer;
-            public Tranlator(Action<NetStream, object> _w, Func<NetStream, object> _r)
-            {
-                Reader = _r;
-                Writer = _w;
-            }
-        }
-
-        public static Dictionary<Type, Tranlator> transDict = new Dictionary<Type, Tranlator>();
+        public static TransDict transDict = new TransDict();
 
         public static void RegistValueTypes()
         {
-            transDict[typeof(byte)] = new Tranlator((NetStream _s, object _obj)
+            transDict[typeof(byte)] = new Translator((NetStream _s, object _obj)
                 => {
                     _s.WriteByte((byte)_obj);
                 },
@@ -36,7 +40,7 @@ namespace CoreNet.Protocols
                     return _s.ReadByte();
                 });
 
-            transDict[typeof(bool)] = new Tranlator((NetStream _s, object _obj)
+            transDict[typeof(bool)] = new Translator((NetStream _s, object _obj)
                 => {
                     _s.WriteBool((bool)_obj);
                 },
@@ -44,7 +48,7 @@ namespace CoreNet.Protocols
                 => {
                     return _s.ReadBool();
                 });
-            transDict[typeof(char)] = new Tranlator((NetStream _s, object _obj)
+            transDict[typeof(char)] = new Translator((NetStream _s, object _obj)
                 => {
                     _s.WriteChar((char)_obj);
                 },
@@ -52,7 +56,7 @@ namespace CoreNet.Protocols
                 => {
                     return _s.ReadChar();
                 });
-            transDict[typeof(string)] = new Tranlator((NetStream _s, object _obj)
+            transDict[typeof(string)] = new Translator((NetStream _s, object _obj)
                 => {
                     _s.WriteStr((string)_obj);
                 },
@@ -60,7 +64,7 @@ namespace CoreNet.Protocols
                 => {
                     return _s.ReadStr();
                 });
-            transDict[typeof(short)] = new Tranlator((NetStream _s, object _obj)
+            transDict[typeof(short)] = new Translator((NetStream _s, object _obj)
                 => {
                     _s.WriteInt16((short)_obj);
                 },
@@ -68,7 +72,7 @@ namespace CoreNet.Protocols
                 => {
                     return _s.ReadInt16();
                 });
-            transDict[typeof(int)] = new Tranlator((NetStream _s, object _obj)
+            transDict[typeof(int)] = new Translator((NetStream _s, object _obj)
                 => {
                     _s.WriteInt32((int)_obj);
                 },
@@ -76,7 +80,7 @@ namespace CoreNet.Protocols
                 => {
                     return _s.ReadInt32();
                 });
-            transDict[typeof(long)] = new Tranlator((NetStream _s, object _obj)
+            transDict[typeof(long)] = new Translator((NetStream _s, object _obj)
                 => {
                     _s.WriteInt64((long)_obj);
                 },
@@ -84,7 +88,7 @@ namespace CoreNet.Protocols
                 => {
                     return _s.ReadInt64();
                 });
-            transDict[typeof(ushort)] = new Tranlator((NetStream _s, object _obj)
+            transDict[typeof(ushort)] = new Translator((NetStream _s, object _obj)
                 => {
                     _s.WriteUInt16((ushort)_obj);
                 },
@@ -92,7 +96,7 @@ namespace CoreNet.Protocols
                 => {
                     return _s.ReadUInt16();
                 });
-            transDict[typeof(uint)] = new Tranlator((NetStream _s, object _obj)
+            transDict[typeof(uint)] = new Translator((NetStream _s, object _obj)
                 => {
                     _s.WriteUInt32((uint)_obj);
                 },
@@ -100,7 +104,7 @@ namespace CoreNet.Protocols
                 => {
                     return _s.ReadUInt32();
                 });
-            transDict[typeof(ulong)] = new Tranlator((NetStream _s, object _obj)
+            transDict[typeof(ulong)] = new Translator((NetStream _s, object _obj)
                 => {
                     _s.WriteUInt64((ulong)_obj);
                 },
@@ -114,7 +118,7 @@ namespace CoreNet.Protocols
         public static void RegistCommonEnum()
         {
             Type t = typeof(Packet.PACKET_TYPE);
-            transDict[t] = new Tranlator((NetStream _s, object _obj)
+            transDict[t] = new Translator((NetStream _s, object _obj)
                 => {
                     _s.WriteUInt16((ushort)_obj);
                 },
@@ -126,18 +130,20 @@ namespace CoreNet.Protocols
             logger.WriteDebugTrace("complete");
         }
 
-        public static void RegistCustom()
+        public static bool RegistCustom<T>(Writer _w, Reader _r)
         {
-            logger.WriteDebugTrace("complete");
-            return;
+            Type t = typeof(T);
+            if (transDict.ContainsKey(t))
+                return false;
+            transDict[t] = new Translator(_w, _r);
+            return true;
         }
+
 
         public static bool Init()
         {
             RegistValueTypes();
-
             RegistCommonEnum();
-            RegistCustom();
             return true;
         }
 
