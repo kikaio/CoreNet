@@ -104,6 +104,11 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Cryptor\CryptHelper.cs" />
+    <Compile Include="Cryptor\DHCryptor.cs" />
+    <Compile Include="Cryptor\HashSha256.cs" />
+    <Compile Include="Cryptor\RsaCryptor.cs" />
+    <Compile Include="Cryptor\XORCryptor.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
