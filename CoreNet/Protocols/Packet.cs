@@ -8,9 +8,17 @@ using System.Threading.Tasks;
 
 namespace CoreNet.Protocols
 {
+    //heartbeats packet은 packet type 없이 바로 처리됨.
+    public class HeartbeatNoti : Packet
+    {
+        public HeartbeatNoti()
+        {
+            SetHeader(0);
+        }
+    }
+
     public class Packet
     {
-
         public static int GetHeaderSize()
         {
             return sizeof(Int32);

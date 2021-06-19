@@ -111,6 +111,7 @@
     <Compile Include="Cryptor\XORCryptor.cs" />
     <Compile Include="DB\CoreDbContext.cs" />
     <Compile Include="Jobs\Job.cs" />
+    <Compile Include="Jobs\JobInfinity.cs" />
     <Compile Include="Jobs\JobNormal.cs" />
     <Compile Include="Jobs\JobOnce.cs" />
     <Compile Include="Jobs\Worker.cs" />

@@ -372,7 +372,7 @@ namespace CoreNet.Networking
                 while (remainCnt > 0)
                 {
                     recvCnt = await Task.Factory.FromAsync(s
-                        .BeginReceive(header, header.Length - remainCnt, remainCnt, SocketFlags.None, null, s), s.EndReceive, TaskCreationOptions.AttachedToParent);
+                        .BeginReceive(header, header.Length - remainCnt, remainCnt, SocketFlags.None, null, s), s.EndReceive);
                     if (recvCnt <= 0)
                         return null;
                     remainCnt -= recvCnt;
@@ -399,7 +399,7 @@ namespace CoreNet.Networking
                     while (remainCnt > 0)
                     {
                         recvCnt = await Task.Factory.FromAsync(s
-                        .BeginReceive(data, data.Length - remainCnt, remainCnt, SocketFlags.None, null, s), s.EndReceive, TaskCreationOptions.AttachedToParent);
+                        .BeginReceive(data, data.Length - remainCnt, remainCnt, SocketFlags.None, null, s), s.EndReceive);
                         if (recvCnt <= 0)
                             return null;
                         remainCnt -= recvCnt;
@@ -410,7 +410,6 @@ namespace CoreNet.Networking
                     {
                         dStream.DoDhDeCrypt(dh_key, dh_iv);
                     }
-
 
                     Packet newPacket = new Packet(hStream, dStream);
                     //newPacket.UpdateHeader();
