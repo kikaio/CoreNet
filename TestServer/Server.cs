@@ -14,13 +14,13 @@ namespace TestServer
 {
     public class Server : CoreNetwork
     {
-        public static Server Inst => new Server();
+        public static Server Inst { get; } = new Server();
 
         private Dictionary<string, Worker> wDict = new Dictionary<string, Worker>();
 
         private List<CoreSession> expiredList = new List<CoreSession>();
 
-        private CoreSession mListener;
+        private CoreTCP mListener;
 
         private Server()
             : base( _name :"TEST", _port:30000)
@@ -51,6 +51,7 @@ namespace TestServer
             }
 
         }
+
         public override void ReadyToStart()
         {
             wDict["pkg"] = new Worker("pkg");
@@ -72,13 +73,13 @@ namespace TestServer
                     else
                         PackageDispatcher(pkg);
                 }
-                CheckSessionHB();
+                //CheckSessionHB();
             }));
-
-            mListener.Sock.Sock.Bind(new IPEndPoint(IPAddress.Any, port));
-            mListener.Sock.Sock.SetSocketOption(SocketOptionLevel.Tcp, SocketOptionName.NoDelay, true);
-            mListener.Sock.Sock.SetSocketOption(SocketOptionLevel.Tcp, SocketOptionName.ReuseAddress, true);
-            mListener.Sock.Sock.Listen(100);
+            Socket sock = new Socket(SocketType.Stream, ProtocolType.Tcp);
+            mListener = new CoreTCP(sock);
+            sock.Bind(new IPEndPoint(IPAddress.Any, port));
+            sock.SetSocketOption(SocketOptionLevel.Tcp, SocketOptionName.NoDelay, true);
+            sock.Listen(100);
         }
 
         public override void Start()
@@ -87,7 +88,7 @@ namespace TestServer
                 Logging("Accept is start");
                 while (isDown == false)
                 {
-                    Socket s = mListener.Sock.Sock.Accept();
+                    Socket s = mListener.Sock.Accept();
                     var newSId = SessionMgr.Inst.GetNextSessionId();
                     var newClient = new CoreSession(newSId, new CoreTCP(s));
                     SessionMgr.Inst.AddSession(newClient);
@@ -103,7 +104,10 @@ namespace TestServer
                                     break;
                                 var p = await client.OnRecvTAP();
                                 if (p.GetHeader() == 0)
+                                {
+                                    Logging("cleint hbupdated");
                                     client.UpdateHeartBeat();
+                                }
                                 else
                                     packageQ.Push(new Package(client, p));
                             }

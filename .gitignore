@@ -3,3 +3,5 @@ CoreNet/obj/
 CoreNet/bin/Debug/
 TestClient/obj/
 TestServer/obj/
+TestClient/bin/
+TestServer/bin/

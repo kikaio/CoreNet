@@ -217,6 +217,7 @@ namespace CoreNet.Networking
             var ret = sock.BeginSend(_p.header.bytes, 0, Packet.GetHeaderSize()
                 , SocketFlags.None, acb, _p);
         }
+
         private void SendAsyncHeader(IAsyncResult _ar, Action<Packet> _callback)
         {
             try
@@ -378,7 +379,7 @@ namespace CoreNet.Networking
                     remainCnt -= recvCnt;
                 }
                 var hStream = new NetStream(header);
-
+                hStream.RenderBytes();
                 if (IsXorAble)
                 {
                     hStream.DoXorCrypt(xorKeyBytes);
@@ -410,7 +411,7 @@ namespace CoreNet.Networking
                     {
                         dStream.DoDhDeCrypt(dh_key, dh_iv);
                     }
-
+                    dStream.RenderBytes();
                     Packet newPacket = new Packet(hStream, dStream);
                     //newPacket.UpdateHeader();
                     return newPacket;
@@ -451,6 +452,8 @@ namespace CoreNet.Networking
                 int headerRemainCnt = Packet.GetHeaderSize();
                 int headerVal = _p.GetHeader();
 
+                _p.header.RenderBytes();
+                _p.data.RenderBytes();
 
                 int sendCnt = 0;
                 //_p.RenderPacket();
