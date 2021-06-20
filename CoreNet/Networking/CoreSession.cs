@@ -463,31 +463,35 @@ namespace CoreNet.Networking
                     byte[] headerBytes = _p.header.bytes;
                     int sendCnt = 0;
 
-                    while (headerRemainCnt > 0)
+                    if (headerVal == 0)
                     {
-                        sendCnt = await Task<int>.Factory.FromAsync(s
-                        .BeginSend(headerBytes, Packet.GetHeaderSize() - headerRemainCnt, headerRemainCnt, SocketFlags.None, null, s), s.EndSend);
-                        if (sendCnt <= 0)
-                            return false;
-                        headerRemainCnt -= sendCnt;
-                    }
-
-                    if (headerVal != 0) //hb packet 아닌 경우.
-                    {
-                        sendCnt = 0;
-                        byte[] dataBytes = _p.data.bytes;
-                        int contentRemainCnt = headerVal;
-
-                        while (contentRemainCnt > 0)
+                        while (headerRemainCnt > 0)
                         {
                             sendCnt = await Task<int>.Factory.FromAsync(s
-                            .BeginSend(dataBytes, headerVal - contentRemainCnt, contentRemainCnt, SocketFlags.None, null, s), s.EndSend);
+                            .BeginSend(headerBytes, Packet.GetHeaderSize() - headerRemainCnt, headerRemainCnt, SocketFlags.None, null, s), s.EndSend);
                             if (sendCnt <= 0)
                                 return false;
-                            contentRemainCnt -= sendCnt;
+                            headerRemainCnt -= sendCnt;
                         }
+                        return true;
                     }
-                    return true;
+                    else
+                    {
+                        //일반 packet은 stream을 한번에 통째로 전송한다.
+                        byte[] data = new byte[Packet.GetHeaderSize() + _p.data.offset];
+                        Array.Copy(_p.header.bytes, data, Packet.GetHeaderSize());
+                        Array.Copy(_p.data.bytes, 0, data, Packet.GetHeaderSize(), _p.data.offset);
+                        int remainCnt = data.Length;
+                        while (remainCnt > 0)
+                        {
+                            sendCnt = await Task<int>.Factory
+                                .FromAsync(s.BeginSend(data, data.Length - remainCnt, remainCnt, SocketFlags.None, null, s), s.EndSend);
+                            if (sendCnt <= 0)
+                                return false;
+                            remainCnt -= sendCnt;
+                        }
+                        return true;
+                    }
                 }
                 catch (Exception e)
                 {
