@@ -42,7 +42,7 @@ namespace CoreNet.Networking
 
         public void PackageDispatcher(Package _pkg)
         {
-            //network 단계에서 packet type, content type을 미리 읽는다.
+            //network 단계에서 packet type 을 미리 읽는다.
             _pkg.Packet.ReadPacketType();
             switch (_pkg.Packet.pType)
             {

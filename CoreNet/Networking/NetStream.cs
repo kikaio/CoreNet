@@ -183,7 +183,7 @@ namespace CoreNet.Networking
 
         public UInt16 ReadUInt16()
         {
-            var tmp = ReadBytes(sizeof(short));
+            var tmp = ReadBytes(sizeof(ushort));
             return BitConverter.ToUInt16(tmp, 0);
         }
 

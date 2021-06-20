@@ -29,6 +29,8 @@ namespace CoreNet.Protocols
 
         public static TransDict transDict = new TransDict();
 
+        private static bool isInit = false;
+
         public static void RegistValueTypes()
         {
             transDict[typeof(byte)] = new Translator((NetStream _s, object _obj)
@@ -142,9 +144,13 @@ namespace CoreNet.Protocols
 
         public static bool Init()
         {
-            RegistValueTypes();
-            RegistCommonEnum();
-            return true;
+            if (isInit == false)
+            {
+                RegistValueTypes();
+                RegistCommonEnum();
+            }
+            isInit = true;
+            return isInit;
         }
 
         public static T Read<T>(NetStream _s)

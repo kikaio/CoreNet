@@ -389,7 +389,7 @@ namespace CoreNet.Networking
 
                 if (headerVal == 0)
                 {
-                    var hbPacket = new Packet(0);
+                    var hbPacket = new HeartbeatNoti();
                     return hbPacket;
                 }
                 else
@@ -400,7 +400,7 @@ namespace CoreNet.Networking
                     while (remainCnt > 0)
                     {
                         recvCnt = await Task.Factory.FromAsync(s
-                        .BeginReceive(data, data.Length - remainCnt, remainCnt, SocketFlags.None, null, s), s.EndReceive);
+                        .BeginReceive(data, headerVal - remainCnt, remainCnt, SocketFlags.None, null, s), s.EndReceive);
                         if (recvCnt <= 0)
                             return null;
                         remainCnt -= recvCnt;
@@ -455,13 +455,13 @@ namespace CoreNet.Networking
                 _p.header.RenderBytes();
                 _p.data.RenderBytes();
 
-                int sendCnt = 0;
                 //_p.RenderPacket();
                 try
                 {
                     if (IsXorAble)
                         _p.header.DoXorCrypt(xorKeyBytes);
                     byte[] headerBytes = _p.header.bytes;
+                    int sendCnt = 0;
 
                     while (headerRemainCnt > 0)
                     {
@@ -474,6 +474,7 @@ namespace CoreNet.Networking
 
                     if (headerVal != 0) //hb packet 아닌 경우.
                     {
+                        sendCnt = 0;
                         byte[] dataBytes = _p.data.bytes;
                         int contentRemainCnt = headerVal;
 
