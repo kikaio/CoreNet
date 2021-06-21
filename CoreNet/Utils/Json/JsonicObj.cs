@@ -24,6 +24,57 @@ namespace CoreNet.Utils.Json
                     ;
             }
         }
+        protected JObject GetJObjectFromProperties()
+        {
+            var pList = GetType().GetProperties();
+            JObject ret = new JObject();
+
+            foreach (var pInfo in pList)
+            {
+                string tagName = pInfo.Name;
+                TypeCode tCode = Type.GetTypeCode(pInfo.PropertyType);
+                var val = pInfo.GetValue(this);
+                switch (tCode)
+                {
+                    case TypeCode.Boolean:
+                        ret[tagName.ToUpper()] = (bool)val;
+                        break;
+                    case TypeCode.Int16:
+                        ret[tagName.ToUpper()] = (Int16)val;
+                        break;
+                    case TypeCode.Int32:
+                        ret[tagName.ToUpper()] = (Int32)val;
+                        break;
+                    case TypeCode.Int64:
+                        ret[tagName.ToUpper()] = (Int64)val;
+                        break;
+                    case TypeCode.Double:
+                        ret[tagName.ToUpper()] = (Double)val;
+                        break;
+                    case TypeCode.String:
+                        ret[tagName.ToUpper()] = val.ToString();
+                        break;
+                    //JSON읽어올 때 해당 타입들 안쓸거임.
+                    case TypeCode.Empty:
+                    case TypeCode.Object:
+                    case TypeCode.DBNull:
+                    case TypeCode.Char:
+                    case TypeCode.SByte:
+                    case TypeCode.Byte:
+                    case TypeCode.UInt16:
+                    case TypeCode.UInt32:
+                    case TypeCode.UInt64:
+                    case TypeCode.Single:
+                    case TypeCode.Decimal:
+                    case TypeCode.DateTime:
+                        break;
+                    default:
+                        break;
+                }
+            }
+            return ret;
+        }
+
         //JToken의 값은 무조건 string으로 변환 후 다시 형변화 한다.=> 안전성이냐 최적화냐
         protected void SetPropertyFromJToken(PropertyInfo _pInfo, JToken _jToken)
         {
