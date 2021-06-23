@@ -445,8 +445,11 @@ namespace CoreNet.Networking
                 //hb패킷이 아닌경우 
                 if (_p.GetHeader() != 0 && IsDhAble)
                 {
-                    _p.data.DoDhEncrypt(dh_key, dh_iv);
-                    _p.UpdateHeader();
+                    if (_p.header.IsXored == false)
+                    {
+                        _p.data.DoDhEncrypt(dh_key, dh_iv);
+                        _p.UpdateHeader();
+                    }
                 }
 
                 int headerRemainCnt = Packet.GetHeaderSize();
