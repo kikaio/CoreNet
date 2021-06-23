@@ -379,12 +379,13 @@ namespace CoreNet.Networking
                     remainCnt -= recvCnt;
                 }
                 var hStream = new NetStream(header);
-                if (IsXorAble)
+                var headerVal = BitConverter.ToInt32(hStream.bytes, 0);
+                if (headerVal != 0 && IsXorAble)
                 {
                     hStream.DoXorCrypt(xorKeyBytes);
+                    headerVal = BitConverter.ToInt32(hStream.bytes, 0);
                 }
 
-                var headerVal = BitConverter.ToInt32(hStream.bytes, 0);
 
                 if (headerVal == 0)
                 {
@@ -440,6 +441,7 @@ namespace CoreNet.Networking
         {
             var s = Sock.Sock;
             {
+//                int dataLen = _p.data.offset;
                 //hb패킷이 아닌경우 
                 if (_p.GetHeader() != 0 && IsDhAble)
                 {
@@ -449,14 +451,11 @@ namespace CoreNet.Networking
 
                 int headerRemainCnt = Packet.GetHeaderSize();
                 int headerVal = _p.GetHeader();
-
                 try
                 {
-                    if (IsXorAble)
-                        _p.header.DoXorCrypt(xorKeyBytes);
                     byte[] headerBytes = _p.header.bytes;
                     int sendCnt = 0;
-
+                    //if(dataLen == 0)
                     if (headerVal == 0)
                     {
                         while (headerRemainCnt > 0)
@@ -471,6 +470,8 @@ namespace CoreNet.Networking
                     }
                     else
                     {
+                        if (IsXorAble)
+                            _p.header.DoXorCrypt(xorKeyBytes);
                         //일반 packet은 stream을 한번에 통째로 전송한다.
                         byte[] data = new byte[Packet.GetHeaderSize() + _p.data.offset];
                         Array.Copy(_p.header.bytes, data, Packet.GetHeaderSize());
