@@ -14,8 +14,8 @@ namespace CoreNet.Networking
         public int offset { get; private set; } = 0;
 
         //한개 Packet을 여러 Session에게 보낼 때 중복 암호화 난독화가 안되도록 구분.
-        private bool isDhEncrypted = false;
-        private bool isXored = false;
+        public bool IsDhEncrypted { get; private set; } = false;
+        public bool IsXored { get; private set; } = false;
 
         public NetStream(long _capacity = 512)
         {
@@ -213,20 +213,20 @@ namespace CoreNet.Networking
 
         public void DoXorCrypt(byte[] _key)
         {
-            if (isXored)
+            if (IsXored)
                 return;
             bytes = CryptHelper.XorEncrypt(bytes, _key);
-            isXored = true;
+            IsXored = true;
         }
 
         public void DoDhEncrypt(byte[] _key, byte[] _iv)
         {
-            if (isDhEncrypted)
+            if (IsDhEncrypted)
                 return;
             string base64Str = Convert.ToBase64String(bytes);
             bytes = CryptHelper.DhEncrypt(base64Str, _key, _iv);
             offset = bytes.Length;
-            isDhEncrypted = true;
+            IsDhEncrypted = true;
         }
         public void DoDhDeCrypt(byte[] _key, byte[] _iv)
         {
