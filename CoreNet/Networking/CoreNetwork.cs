@@ -44,6 +44,7 @@ namespace CoreNet.Networking
         {
             //network 단계에서 packet type 을 미리 읽는다.
             _pkg.Packet.ReadPacketType();
+            logger.WriteDebug($"[{_pkg.Packet.pType.ToString()}] analized");
             switch (_pkg.Packet.pType)
             {
                 case Packet.PACKET_TYPE.REQ:
