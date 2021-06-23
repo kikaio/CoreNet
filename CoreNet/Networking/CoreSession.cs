@@ -440,25 +440,19 @@ namespace CoreNet.Networking
         {
             var s = Sock.Sock;
             {
-                //hb패킷이 아닌경우 
-                if (_p.GetHeader() != 0 && IsDhAble)
-                {
-                    _p.data.DoDhEncrypt(dh_key, dh_iv);
-                    _p.UpdateHeader();
-                }
-
-                int headerRemainCnt = Packet.GetHeaderSize();
-                int headerVal = _p.GetHeader();
-
+               
                 try
                 {
-                    if (IsXorAble)
-                        _p.header.DoXorCrypt(xorKeyBytes);
+                    int headerVal = _p.GetHeader();
                     byte[] headerBytes = _p.header.bytes;
                     int sendCnt = 0;
 
                     if (headerVal == 0)
                     {
+                        if (IsXorAble)
+                            _p.header.DoXorCrypt(xorKeyBytes);
+
+                        int headerRemainCnt = Packet.GetHeaderSize();
                         while (headerRemainCnt > 0)
                         {
                             sendCnt = await Task<int>.Factory.FromAsync(s
@@ -471,6 +465,13 @@ namespace CoreNet.Networking
                     }
                     else
                     {
+                        if (IsDhAble)
+                        {
+                            _p.data.DoDhEncrypt(dh_key, dh_iv);
+                            _p.UpdateHeader();
+                        }
+                        if (IsXorAble)
+                            _p.header.DoXorCrypt(xorKeyBytes);
                         //일반 packet은 stream을 한번에 통째로 전송한다.
                         byte[] data = new byte[Packet.GetHeaderSize() + _p.data.offset];
                         Array.Copy(_p.header.bytes, data, Packet.GetHeaderSize());
